@@ -4,6 +4,7 @@
 // Initialize our static external 
 // symbols from our header:
 int Sudoku::grid[10][10];
+ofstream* Sudoku::outs;
 
 int Sudoku::Creator::numHints;
 
@@ -13,13 +14,25 @@ int Sudoku::Solver::numComparisons;
 
 #pragma region Sudoku Methods
 /*
-Function Name: construcor
+Function Name: constructor with ofstream pointer
+Author Name: Jeffrey Fishman
+Creation Date: 08/12/2019
+Modification Date: 08/12/2019
+Purpose: initialize the grid with value NULL (0), and cache an out file stream for use with metrics
+*/
+Sudoku::Sudoku(ofstream* outStream)
+{
+	outs = outStream;
+	Sudoku();
+}
+
+/*
+Function Name: constructor
 Author Name: Chong Zhang, Jeffrey Fishman
 Creation Date: 08/05/2019
 Modification Date: 08/05/2019
 Purpose: initialize the grid with value NULL (0)
 */
-
 Sudoku::Sudoku()
 {
 	// We'll always have a 9x9 grid initialized by our header declaration
@@ -59,10 +72,10 @@ Modification Date: 08/12/2019
 Purpose: display current number of hints, current grid (unassigned location marked as X)
 */
 
-void Sudoku::printGrid(ofstream& outs)
+void Sudoku::printGrid()
 {
 	cout << Creator::getNumHints() << endl;
-	outs << Creator::getNumHints() << endl;
+	*outs << Creator::getNumHints() << endl;
 
 	//display current grid
 	for (int rowID = 1; rowID <= 9; ++rowID)
@@ -73,19 +86,19 @@ void Sudoku::printGrid(ofstream& outs)
 			if (grid[rowID][colID] == -1)
 			{
 				cout << "X ";
-				outs << "X ";
+				*outs << "X ";
 			}
 			else
 			{
 				cout << grid[rowID][colID] << " ";
-				outs << grid[rowID][colID] << " ";
+				*outs << grid[rowID][colID] << " ";
 			}
 		}
 		cout << endl;
-		outs << endl;
+		*outs << endl;
 	}
 	cout << endl;
-	outs << endl;
+	*outs << endl;
 }
 
 /*
@@ -339,6 +352,8 @@ bool Sudoku::Solver::validateCompletedSubGrid(int rowID, int colID)
 				return false;
 		}
 	}
+
+	//Solver::printSubGrid();
 	return true;
 }
 #pragma endregion

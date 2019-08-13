@@ -15,14 +15,16 @@ class Sudoku
 {
 public:
 	Sudoku();
+	Sudoku(ofstream* outStream);
 	static void setGrid(int** array);
-	static void printGrid(ofstream& outs);									  //display the number of hints and the grid
+	static void printGrid();						              			  //display the number of hints and the grid
 	static void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
 	static int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
 	static bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
 
 protected:
 	static int grid[10][10];		                                                   //use index 1 to 9
+	static ofstream* outs;
 
 	/*
 	 * Purpose: Solver sub class
