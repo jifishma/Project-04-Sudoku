@@ -7,6 +7,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 using namespace std;
@@ -18,6 +19,7 @@ public:
 	Sudoku(ofstream* outStream);
 	static void setGrid(int** array);
 	static void printGrid();						              			  //display the number of hints and the grid
+	static void printSubGrid(int rowID, int colID);						      //display the sub-grid by the defined quadrant
 	static void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
 	static int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
 	static bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
@@ -42,7 +44,7 @@ protected:
 		static pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1);	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
 		static bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9, 9-1), if no solution, return false
 
-		static bool validateCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
+		static bool printCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
 
 	private:
 		static int numComparisons;

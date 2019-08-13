@@ -93,7 +93,61 @@ void Sudoku::printGrid()
 				cout << grid[rowID][colID] << " ";
 				*outs << grid[rowID][colID] << " ";
 			}
+
+			if (!(colID % 3) && colID != 9)
+			{
+				cout << "| ";
+				*outs << "| ";
+			}
 		}
+
+		if (!(rowID % 3) && rowID != 9)
+		{
+			cout << setw(21) << setfill('-') << endl << "-";
+			*outs << setw(21) << setfill('-') << endl << "-";
+		}
+
+		cout << endl;
+		*outs << endl;
+	}
+	cout << endl;
+	*outs << endl;
+}
+
+void Sudoku::printSubGrid(int rID, int cID)
+{ 
+	cout << "Subgrid completed: " << endl;
+	*outs << "Subgrid completed: " << endl;
+
+	for (int rowID = 1; rowID <= 9; ++rowID)
+	{
+		for (int colID = 1; colID <= 9; ++colID)
+		{
+			//unsigned location marked as X
+			if (rowID > rID + 3 || colID > cID + 3 || rowID <= rID || colID <= cID )
+			{
+				cout << "X ";
+				*outs << "X ";
+			}
+			else
+			{
+				cout << grid[rowID][colID] << " ";
+				*outs << grid[rowID][colID] << " ";
+			}
+
+			if (!(colID % 3) && colID != 9)
+			{
+				cout << "| ";
+				*outs << "| ";
+			}
+		}
+
+		if (!(rowID % 3) && rowID != 9)
+		{
+			cout << setw(21) << setfill('-') << endl << "-";
+			*outs << setw(21) << setfill('-') << endl << "-";
+		}
+
 		cout << endl;
 		*outs << endl;
 	}
@@ -317,7 +371,7 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 			grid[rowID][colID] = value;
 			Creator::incNumHints();
 
-			validateCompletedSubGrid(rowID, colID);
+			printCompletedSubGrid(rowID, colID);
 
 			if (solveSudoku(solveBackwards))
 				return true;
@@ -332,14 +386,14 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 }
 
 /*
-Function Name: validateCOmpletedSubGrid
+Function Name: printCompletedSubGrid
 Author Name: Jeffrey Fishman
 Creation Date: 08/12/2019
 Modification Date: 08/12/2019
 Purpose: return if given cell's subgrid is completely populated or not
 */
 
-bool Sudoku::Solver::validateCompletedSubGrid(int rowID, int colID)
+bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID)
 {
 	int subGridStartRowID = ((rowID - 1) / 3) * 3;
 	int subGridStartColID = ((colID - 1) / 3) * 3;
@@ -348,12 +402,13 @@ bool Sudoku::Solver::validateCompletedSubGrid(int rowID, int colID)
 	{
 		for (int col = 1; col <= 3; ++col)
 		{
-			if (grid[row][col] == NULL)
+			int& cellValue = grid[subGridStartRowID + row][subGridStartColID + col];
+			if (cellValue == NULL)
 				return false;
 		}
 	}
 
-	//Solver::printSubGrid();
+	printSubGrid(subGridStartRowID, subGridStartColID);
 	return true;
 }
 #pragma endregion
