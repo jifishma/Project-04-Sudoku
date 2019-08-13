@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Purpose: Sukoku - header file
+ * Purpose: Sukoku superclass - header file
  * Author Name: Chong Zhang, Jeffrey Fishman
  * Creation Date: 08/05/2019
  * Modification Date: 08/12/2019
@@ -19,47 +19,55 @@ public:
 	static void printGrid(ofstream& outs);									  //display the number of hints and the grid
 	static void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
 	static int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
+	static bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
 
 protected:
 	static int grid[10][10];		                                                   //use index 1 to 9
-};
 
-/*
- * Purpose: Solver child class
- * Author Name: Jeffrey Fishman
- * Creation Date: 08/12/2019
- * Modification Date: 08/12/2019
- */
-class Solver : public Sudoku
-{
+	/*
+	 * Purpose: Solver sub class
+	 * Author Name: Jeffrey Fishman
+	 * Creation Date: 08/12/2019
+	 * Modification Date: 08/12/2019
+	 */
+	class Solver
+	{
+	public:
+		static bool usedInRow(int rowID, int value);								  //check if the given value has been used in row, if not, return false
+		static bool usedInColumn(int colID, int value);								//check if the given value has been used in column, if not, return false
+		static bool usedInSubGrid(int rowID, int colID, int value);				  //check if the given value has been used in sub-grid, if not, return false
+
+		static pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1);	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
+		static bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9, 9-1), if no solution, return false
+
+		static bool validateCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
+
+	private:
+		static int numComparisons;
+		static int numBacktracks;
+		static time_t timer;
+	};
+
+	/*
+	 * Purpose: Creator sub class
+	 * Author Name: Jeffrey Fishman
+	 * Creation Date: 08/12/2019
+	 * Modification Date: 08/12/2019
+	 */
+	class Creator
+	{
+	public:
+		static void setNumHints(int hints);
+		static int getNumHints();
+		static void incNumHints();                                                        //increase the number of hints by one
+		static void decNumHints();                                                        //decrease the number of hints by one
+
+	private:
+		static int numHints;                                                              //require a minimum of 17 numbers
+	};
+
 public:
-	static bool usedInRow(int rowID, int value);								  //check if the given value has been used in row, if not, return 0
-	static bool usedInColumn(int colID, int value);								//check if the given value has been used in column, if not, return 0
-	static bool usedInSubGrid(int rowID, int colID, int value);				  //check if the given value has been used in sub-grid, if not, return 0
-
-	static bool printCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
-
-	static bool selectUnassignedLocation(int& rowID, int& colID);					   //find an unassigned location (rowID, colID), if grid has no empty location, return 0
-	static bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
-
-	static bool solveSudoku(int rowID, int colID);                                    //solve sudoku, start from value 1 to 9 in increasing order, if no solution, return 0
-	static bool solveSudokuReverse(int rowID, int colID);							 //solve sudoku, start from value 9 to 1 in decreasing order, if no solution, return 0
-};
-
-/*
- * Purpose: Creator child class
- * Author Name: Jeffrey Fishman
- * Creation Date: 08/12/2019
- * Modification Date: 08/12/2019
- */
-class Creator : public Sudoku
-{
-public:
-	static void setNumHints(int hints);
-	static int getNumHints();
-	static void incNumHints();                                                        //increase the number of hints by one
-	static void decNumHints();                                                        //decrease the number of hints by one
-
-private:
-	static int numHints;                                                              //require a minimum of 17 numbers
+	// Class containers for access from within Sudoku class
+	Solver solver;
+	Creator creator;
 };
