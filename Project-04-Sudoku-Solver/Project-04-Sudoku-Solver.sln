@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project-04-Sudoku-Solver", "Project-04-Sudoku-Solver.vcxproj", "{71076F98-8053-49D6-A612-61604D116F47}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project-04-Sudoku-Creator", "..\Project-04-Sudoku-Creator\Project-04-Sudoku-Creator.vcxproj", "{570D0EA9-68EB-4AA7-99F6-1DB675B57945}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project-04-Sudoku", "..\Project-04-Sudoku\Project-04-Sudoku.vcxproj", "{2ED8501A-223D-4330-8CBD-17E8A2030B09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +25,22 @@ Global
 		{71076F98-8053-49D6-A612-61604D116F47}.Release|x64.Build.0 = Release|x64
 		{71076F98-8053-49D6-A612-61604D116F47}.Release|x86.ActiveCfg = Release|Win32
 		{71076F98-8053-49D6-A612-61604D116F47}.Release|x86.Build.0 = Release|Win32
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Debug|x64.ActiveCfg = Debug|x64
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Debug|x64.Build.0 = Debug|x64
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Debug|x86.ActiveCfg = Debug|Win32
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Debug|x86.Build.0 = Debug|Win32
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Release|x64.ActiveCfg = Release|x64
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Release|x64.Build.0 = Release|x64
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Release|x86.ActiveCfg = Release|Win32
+		{570D0EA9-68EB-4AA7-99F6-1DB675B57945}.Release|x86.Build.0 = Release|Win32
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Debug|x64.ActiveCfg = Debug|x64
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Debug|x64.Build.0 = Debug|x64
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Debug|x86.ActiveCfg = Debug|Win32
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Debug|x86.Build.0 = Debug|Win32
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Release|x64.ActiveCfg = Release|x64
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Release|x64.Build.0 = Release|x64
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Release|x86.ActiveCfg = Release|Win32
+		{2ED8501A-223D-4330-8CBD-17E8A2030B09}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,6 +14,30 @@ Sudoku::Sudoku(ofstream* outStream)
 	Sudoku();
 }
 
+Sudoku::Sudoku(const Sudoku& puzzle)
+{ 
+	operator=(puzzle);
+}
+
+Sudoku& Sudoku::operator=(const Sudoku& puzzle)
+{
+	// We'll always have a 9x9 grid initialized by our header declaration
+	for (int rowID = 0; rowID <= 9; ++rowID)
+	{
+		for (int colID = 0; colID <= 9; ++colID)
+		{
+			this->grid[rowID][colID] = puzzle.grid[rowID][colID];
+		}
+	}
+
+	this->enableSubGrid = puzzle.enableSubGrid;
+	this->outs = puzzle.outs;
+
+	this->creator.setNumHints(this->creator.getNumHints());
+
+	return *this;
+}
+
 /*
 Function Name: constructor
 Author Name: Chong Zhang, Jeffrey Fishman
@@ -71,7 +95,7 @@ void Sudoku::printGrid()
 		for (int colID = 1; colID <= 9; ++colID)
 		{
 			//unsigned location marked as X
-			if (grid[rowID][colID] == -1)
+			if (grid[rowID][colID] == NULL)
 			{
 				cout << "X ";
 				*outs << "X ";
@@ -112,6 +136,9 @@ Purpose: display a completed subgrid. Cells not part of the subgrid are marked a
 
 void Sudoku::printSubGrid(int rID, int cID)
 { 
+	if (!enableSubGrid)
+		return;
+
 	cout << "Subgrid completed: " << endl;
 	*outs << "Subgrid completed: " << endl;
 
@@ -222,17 +249,7 @@ Purpose: check if the two puzzle grids are not identical
 */
 bool Sudoku::operator!=(Sudoku& rhs)
 {
-	for (int row = 1; row <= 9; ++row)
-	{
-		for (int col = 1; col <= 9; ++col)
-		{
-			if (this->getValue(row, col) != rhs.getValue(row, col))
-			{
-				return true;      //multiple solutions
-			}
-		}
-	}
-	return false;				//unique solution
+	return !operator==(rhs);
 }
 #pragma endregion
 

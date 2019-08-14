@@ -17,6 +17,8 @@ class Sudoku
 public:
 	Sudoku();
 	Sudoku(ofstream* outStream);
+	Sudoku(const Sudoku& puzzle);
+
 	void setGrid(int array[10][10]);
 	void printGrid();						              			  //display the number of hints and the grid
 	void printSubGrid(int rowID, int colID);						      //display the sub-grid by the defined quadrant
@@ -24,8 +26,11 @@ public:
 	int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
 	bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
 
+	bool enableSubGrid = false;
+
 	bool operator==(Sudoku& rhs);                                     //check if two puzzle grids are equal
 	bool operator!=(Sudoku& rhs);                                     //check if two puzzle grids are not equal
+	Sudoku& operator=(const Sudoku& rhs);
 
 protected:
 	int grid[10][10];		                                                   //use index 1 to 9
@@ -46,7 +51,7 @@ protected:
 		bool usedInSubGrid(int rowID, int colID, int value);				  //check if the given value has been used in sub-grid, if not, return false
 
 		pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1);	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
-		bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9, 9-1), if no solution, return false
+		bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9 and 9-1), if no solution, return false
 
 		bool printCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
 

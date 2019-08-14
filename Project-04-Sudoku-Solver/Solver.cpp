@@ -3,6 +3,7 @@
 int main(int argc, char** argv)
 {
 	Sudoku puzzle = Sudoku();
-	puzzle.
+	puzzle.enableSubGrid = true;
+
 	return 0;
 }
