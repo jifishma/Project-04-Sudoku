@@ -189,6 +189,51 @@ bool Sudoku::validToPlace(int rowID, int colID, int value)
 {
 	return !solver.usedInRow(rowID, value) && !solver.usedInColumn(colID, value) && !solver.usedInSubGrid(rowID, colID, value);
 }
+
+/*
+Function Name: equality operator overload
+Author Name: Jeffrey Fishman
+Creation Date: 08/13/2019
+Modification Date: 08/13/2019
+Purpose: check if the two puzzle grids are identical
+*/
+bool Sudoku::operator==(Sudoku& rhs)
+{
+	for (int row = 1; row <= 9; ++row)
+	{
+		for (int col = 1; col <= 9; ++col)
+		{
+			if (this->getValue(row, col) != rhs.getValue(row, col))
+			{
+				return false;      //multiple solutions
+			}
+		}
+	}
+	return true;				//unique solution
+}
+
+
+/*
+Function Name: equality operator overload
+Author Name: Jeffrey Fishman
+Creation Date: 08/13/2019
+Modification Date: 08/13/2019
+Purpose: check if the two puzzle grids are not identical
+*/
+bool Sudoku::operator!=(Sudoku& rhs)
+{
+	for (int row = 1; row <= 9; ++row)
+	{
+		for (int col = 1; col <= 9; ++col)
+		{
+			if (this->getValue(row, col) != rhs.getValue(row, col))
+			{
+				return true;      //multiple solutions
+			}
+		}
+	}
+	return false;				//unique solution
+}
 #pragma endregion
 
 #pragma region Creator Methods

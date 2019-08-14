@@ -24,6 +24,9 @@ public:
 	int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
 	bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
 
+	bool operator==(Sudoku& rhs);                                     //check if two puzzle grids are equal
+	bool operator!=(Sudoku& rhs);                                     //check if two puzzle grids are not equal
+
 protected:
 	int grid[10][10];		                                                   //use index 1 to 9
 	ofstream* outs;

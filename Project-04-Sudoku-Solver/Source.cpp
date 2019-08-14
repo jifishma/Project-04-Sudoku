@@ -6,60 +6,50 @@
 
 /*
  * Purpose: Sudoku creator
- * Author Name: Chong Zhang
+ * Author Name: Chong Zhang, Jeffrey Fishman
  * Creation Date: 08/05/2019
- * Modification Date: 08/12/2019
+ * Modification Date: 08/13/2019
  */
 
-void FileHandling(string inFileName, ifstream& ins, ofstream& outs);
-void ReadInputFile(string inFileName, int array[10][10], ifstream& ins, ofstream& outs);
-bool IsValidData(int array[10][10], int rowID, int colID, int value, ofstream& outs);
-void HintsHandling(int& numHints, ofstream& outs);
+void ValidateFileStreams(string inFileName, ifstream& ins, ofstream& outs);
+void PreparePuzzle(string inFileName, Sudoku& puzzle, ifstream& ins, ofstream& outs);
+bool IsValidData(Sudoku& puzzle, int rowID, int colID, int value, ofstream& outs);
+void ValidateNumHints(int& numHints, ofstream& outs);
 void CreateInputFile(Sudoku puzzle, ofstream& outs);
-bool MultiSolutions(Sudoku puzzle1, Sudoku puzzle2);
 
 int main()
 {
-
 	ifstream ins;
 	ofstream outs;
 	string inFileName, outFileName, outStatistic;
-	int array[10][10];
+
 	Sudoku puzzle = Sudoku(&outs);
 	int numHints = 0;
 
 	//display welcome message
-	cout << "-----------Welcome to Sudoku Creator Program-----------" << endl;
-	outs << "-----------Welcome to Sudoku Creator Program-----------" << endl;
+	cout << "-----------Welcome to Sudoku Program-----------" << endl;
+	outs << "-----------Welcome to Sudoku Program-----------" << endl;
 
-	//ask for input file name 
+	//ask for input file path 
 	cout << "Please enter input file name: ";
 	cin >> inFileName;
 
-	//ask for output statistic file name
+	//ask for output statistic file path
 	cout << "Please enter output statistic file name: ";
 	cin >> outStatistic;
 
-	//open above two files
+	//open the input and output file streams
 	ins.open(inFileName);
 	outs.open(outStatistic);
 
-	//input file handling
-	FileHandling(inFileName, ins, outs);
+	//validate the file streams are opened successfully and contain data
+	ValidateFileStreams(inFileName, ins, outs);
 
-	//read input file into the given array
-	ReadInputFile(inFileName, array, ins, outs);
+	//read input file, and populate the puzzle accordingly
+	PreparePuzzle(inFileName, puzzle, ins, outs);
 
 	//close input file
 	ins.close();
-
-
-
-	//set the grid
-	puzzle.setGrid(array);
-
-	//set the number of hints
-	puzzle.creator.setNumHints(81);
 
 	//print initial data
 	cout << "Initial data" << endl;
@@ -67,13 +57,12 @@ int main()
 	puzzle.printGrid();
 
 
-
 	//ask for the number of hints the user wants (17 to 40) 
 	cout << "Please enter the number of hints (17 to 40): ";
 	cin >> numHints;
 
 	//check if the number of hints is valid
-	HintsHandling(numHints, outs);
+	ValidateNumHints(numHints, outs);
 
 
 
@@ -99,10 +88,10 @@ int main()
 		outs << "(" << rowID << ", " << colID << ") " << value << endl;
 
 		//check if the selected location is valid
-		if (value != -1)
+		if (value != NULL)
 		{
 			//unassign location
-			puzzle.setValue(rowID, colID, -1);
+			puzzle.setValue(rowID, colID, NULL);
 
 			//copy the created Sudoku twice
 			Sudoku copyPuzzle1 = puzzle;
@@ -115,7 +104,7 @@ int main()
 			copyPuzzle2.solver.solveSudoku(true);
 
 			//compare the two above solutions to check if there are multiple solutions
-			if (MultiSolutions(copyPuzzle1, copyPuzzle2))
+			if (copyPuzzle1 != copyPuzzle2)
 			{
 				puzzle.setValue(rowID, colID, value);		//failure, restore the selected location and continue
 			}
@@ -161,20 +150,20 @@ int main()
 
 
 /*
-Function Name: FileHandling
-Author Name: Chong Zhang
+Function Name: ValidateFileStreams
+Author Name: Chong Zhang, Jeffrey Fishman
 Creation Date: 08/12/2019
-Modification Date: 08/12/2019
+Modification Date: 08/13/2019
 Purpose: check if the input file is valid, if not, stop program
 */
 
-void FileHandling(string inFileName, ifstream& ins, ofstream& outs)
+void ValidateFileStreams(string inFileName, ifstream& ins, ofstream& outs)
 {
-	//check if input file exists
-	if (!ins.is_open())
+	//check if input file exists and opened properly
+	if (!ins.is_open() || !ins.good())
 	{
-		cout << "Error message - Input file " << inFileName << " provided does not exist - Program ended" << endl;
-		outs << "Error message - Input file " << inFileName << " provided does not exist - Program ended" << endl;
+		cout << "Error - Provided input file '" << inFileName << "' does not exist. Exiting program." << endl;
+		outs << "Error - Provided input file '" << inFileName << "' does not exist. Exiting program." << endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
@@ -182,8 +171,8 @@ void FileHandling(string inFileName, ifstream& ins, ofstream& outs)
 	//check if input file is empty
 	if (ins.peek() == EOF)
 	{
-		cout << "Error message - Input file " << inFileName << " exists but contains no data - Program ended" << endl;
-		outs << "Error message - Input file " << inFileName << " exists but contains no data - Program ended" << endl;
+		cout << "Error - Input file '" << inFileName << "' exists but contains no data. Exiting program." << endl;
+		outs << "Error - Input file '" << inFileName << "' exists but contains no data. Exiting program." << endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
@@ -192,42 +181,34 @@ void FileHandling(string inFileName, ifstream& ins, ofstream& outs)
 
 
 /*
-Function Name: ReadInputFile
-Author Name: Chong Zhang
+Function Name: PreparePuzzle
+Author Name: Chong Zhang, Jeffrey Fishman
 Creation Date: 08/12/2019
-Modification Date: 08/12/2019
+Modification Date: 08/13/2019
 Purpose: read input file, store into an array and return the number of hints, if file contains invalid data, stop program
 */
 
-void ReadInputFile(string inFileName, int array[10][10], ifstream& ins, ofstream& outs)
+void PreparePuzzle(string inFileName, Sudoku& puzzle, ifstream& ins, ofstream& outs)
 {
 	int rowID, colID, value;
-	int numHints = 0;
+	puzzle.creator.setNumHints(0);
 
 	//display input file name
 	cout << endl << "Input file name: " << inFileName << endl;
 	outs << "Input file name: " << inFileName << endl;
 
-	//initialize the array with -1
-	for (int i = 1; i <= 9; ++i)
-	{
-		for (int j = 1; j <= 9; ++j)
-		{
-			array[i][j] = -1;
-		}
-	}
-
 	//read input file line by line
 	ins >> rowID >> colID >> value;
-	while (ins)
+	while (!ins.eof())
 	{
 		//check if data is valid
-		if (IsValidData(array, rowID, colID, value, outs))
+		if (IsValidData(puzzle, rowID, colID, value, outs))
 		{
 			cout << rowID << " " << colID << " " << value << endl;
 			outs << rowID << " " << colID << " " << value << endl;
-			array[rowID][colID] = value;
-			++numHints;
+
+			puzzle.setValue(rowID, colID, value);
+			puzzle.creator.incNumHints();
 		}
 		else
 		{
@@ -238,10 +219,10 @@ void ReadInputFile(string inFileName, int array[10][10], ifstream& ins, ofstream
 	}
 
 	//check if there is any empty location
-	if (numHints != 81)
+	if (puzzle.creator.getNumHints() != 81)
 	{
-		cout << "Error message - The grid has empty location - Program ended!!" << endl;
-		outs << "Error message - The grid has empty location - Program ended!!" << endl;
+		cerr << "Error - The grid has an empty cell. Exiting program." << endl;
+		outs << "Error - The grid has an empty cell. Exiting program." << endl;
 
 		system("pause");
 		exit(EXIT_FAILURE);                //the grid has empty location, stop program
@@ -255,22 +236,23 @@ void ReadInputFile(string inFileName, int array[10][10], ifstream& ins, ofstream
 
 /*
 Function Name: IsValidData
-Author Name: Chong Zhang
+Author Name: Chong Zhang, Jeffrey Fishman
 Creation Date: 08/07/2019
-Modification Date: 08/12/2019
+Modification Date: 08/132019
 Purpose: check if input file contains invalid value or duplicate value
 */
 
-bool IsValidData(int array[10][10], int rowID, int colID, int value, ofstream& outs)
+bool IsValidData(Sudoku& puzzle, int rowID, int colID, int value, ofstream& outs)
 {
 	//check if input file contains duplicate data
-	if (array[rowID][colID] != -1)
+	if (puzzle.getValue(rowID, colID) != NULL)
 	{
 		cout << rowID << " " << colID << " " << value;
 		outs << rowID << " " << colID << " " << value;
-		cout << "\t\t Error message - Duplicate value - Program ended" << endl;
-		outs << "\t\t Error message - Duplicate value - Program ended" << endl;
-		return 0;
+
+		cerr << "\t\t Error - Duplicate value - Program ended" << endl;
+		outs << "\t\t Error - Duplicate value - Program ended" << endl;
+		return false;
 	}
 
 	//check if input file contains invalid value 
@@ -278,12 +260,13 @@ bool IsValidData(int array[10][10], int rowID, int colID, int value, ofstream& o
 	{
 		cout << rowID << " " << colID << " " << value;
 		outs << rowID << " " << colID << " " << value;
-		cout << "\t\t Error message - Invalid value - Program ended" << endl;
-		outs << "\t\t Error message - Invalid value - Program ended" << endl;
-		return 0;
+
+		cerr << "\t\t Error - Invalid value - Program ended" << endl;
+		outs << "\t\t Error - Invalid value - Program ended" << endl;
+		return false;
 	}
 
-	return 1;                //valid data, return 1
+	return true;                //valid data, return 1
 }
 
 
@@ -296,11 +279,11 @@ Modification Date: 08/12/2019
 Purpose: check if the number of hints is valid, if not, ask the user to enter again
 */
 
-void HintsHandling(int& numHints, ofstream& outs)
+void ValidateNumHints(int& numHints, ofstream& outs)
 {
 	while (numHints < 17 || numHints > 40)
 	{
-		cout << "Error message - Invalid number of hints" << endl;
+		cerr << "Error - Invalid number of hints" << endl;
 
 		cout << "Please enter the number of hints (17 to 40): ";
 		cin >> numHints;
@@ -327,38 +310,11 @@ void CreateInputFile(Sudoku puzzle, ofstream& outs)
 	{
 		for (int colID = 1; colID <= 9; ++colID)
 		{
-			if (puzzle.getValue(rowID, colID) != -1)
+			if (puzzle.getValue(rowID, colID) != NULL)
 			{
 				cout << rowID << " " << colID << " " << puzzle.getValue(rowID, colID) << endl;
 				outs << rowID << " " << colID << " " << puzzle.getValue(rowID, colID) << endl;
 			}
 		}
 	}
-}
-
-
-
-
-
-/*
-Function Name: MultiSolutions
-Author Name: Chong Zhang
-Creation Date: 08/05/2019
-Modification Date: 08/12/2019
-Purpose: check if there are multiple solutions, if not, return 0
-*/
-
-bool MultiSolutions(Sudoku puzzle1, Sudoku puzzle2)
-{
-	for (int row = 1; row <= 9; ++row)
-	{
-		for (int col = 1; col <= 9; ++col)
-		{
-			if (puzzle1.getValue(row, col) != puzzle2.getValue(row, col))
-			{
-				return 1;      //multiple solutions
-			}
-		}
-	}
-	return 0;				//unique solution
 }
