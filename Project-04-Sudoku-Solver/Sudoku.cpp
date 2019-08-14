@@ -1,17 +1,5 @@
 #include "Sudoku.h"
 
-#pragma region Static Member Declarations
-// Initialize our static external 
-// symbols from our header:
-int Sudoku::grid[10][10];
-ofstream* Sudoku::outs;
-
-int Sudoku::Creator::numHints;
-
-int Sudoku::Solver::numBacktracks;
-int Sudoku::Solver::numComparisons;
-#pragma endregion
-
 #pragma region Sudoku Methods
 /*
 Function Name: constructor with ofstream pointer
@@ -53,7 +41,7 @@ Modification Date: 08/07/2019
 Purpose: assign grid with the given array
 */
 
-void Sudoku::setGrid(int** array)
+void Sudoku::setGrid(int array[10][10])
 {
 	for (int rowID = 1; rowID <= 9; ++rowID)
 	{
@@ -74,8 +62,8 @@ Purpose: display current number of hints, current grid (unassigned location mark
 
 void Sudoku::printGrid()
 {
-	cout << Creator::getNumHints() << endl;
-	*outs << Creator::getNumHints() << endl;
+	cout << creator.getNumHints() << endl;
+	*outs << creator.getNumHints() << endl;
 
 	//display current grid
 	for (int rowID = 1; rowID <= 9; ++rowID)
@@ -199,11 +187,22 @@ Purpose: return if the given value is valid to place in the given location (rowI
 
 bool Sudoku::validToPlace(int rowID, int colID, int value)
 {
-	return !Solver::usedInRow(rowID, value) && !Solver::usedInColumn(colID, value) && !Solver::usedInSubGrid(rowID, colID, value);
+	return !solver.usedInRow(rowID, value) && !solver.usedInColumn(colID, value) && !solver.usedInSubGrid(rowID, colID, value);
 }
 #pragma endregion
 
 #pragma region Creator Methods
+/*
+Function Name: constructor
+Author Name: Jeffrey Fishman
+Creation Date: 08/13/2019
+Modification Date: 08/13/2019
+Purpose: explicit reference to outer Sudoku class
+*/
+Sudoku::Sudoku::Creator::Creator(Sudoku& parent)
+	:sudoku(parent)
+{ }
+
 /*
 Function Name: setNumHints
 Author Name: Chong Zhang
@@ -272,7 +271,7 @@ pair<int, int>* Sudoku::Solver::selectUnassignedLocation(int rowID, int colID)
 	{
 		while (colID <= 9)
 		{
-			if (grid[rowID][colID] == NULL)
+			if (sudoku.grid[rowID][colID] == NULL)
 				return &make_pair(rowID, colID);
 
 			colID++;
@@ -283,6 +282,17 @@ pair<int, int>* Sudoku::Solver::selectUnassignedLocation(int rowID, int colID)
 
 	return nullptr;    //no empty location
 }
+
+/*
+Function Name: constructor
+Author Name: Jeffrey Fishman
+Creation Date: 08/13/2019
+Modification Date: 08/13/2019
+Purpose: explicit reference to outer class
+*/
+Sudoku::Sudoku::Solver::Solver(Sudoku& parent)
+	:sudoku(parent)
+{ }
 
 /*
 Function Name: usedInRow
@@ -296,7 +306,7 @@ bool Sudoku::Solver::usedInRow(int rowID, int value)
 	for (int col = 1; col <= 9; ++col)
 	{
 		numComparisons++;
-		if (grid[rowID][col] == value)
+		if (sudoku.grid[rowID][col] == value)
 			return true;    //value has been used in row 
 	}
 	return false;
@@ -317,7 +327,7 @@ bool Sudoku::Solver::usedInColumn(int colID, int value)
 	for (int row = 1; row <= 9; ++row)
 	{
 		numComparisons++;
-		if (grid[row][colID] == value)
+		if (sudoku.grid[row][colID] == value)
 			return true;    //value has been used in column 
 	}
 	return false;
@@ -341,7 +351,7 @@ bool Sudoku::Solver::usedInSubGrid(int rowID, int colID, int value)
 		for (int col = 1; col <= 3; ++col)
 		{
 			numComparisons++;
-			if (grid[subGridStartRowID + row][subGridStartColID + col] == value)
+			if (sudoku.grid[subGridStartRowID + row][subGridStartColID + col] == value)
 				return true;    //value has been used in sub-grid 
 		}
 	}
@@ -374,22 +384,22 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 
 	for (int value = from; solveBackwards ? value >= to : value <= to; value += increment)
 	{
-		if (validToPlace(rowID, colID, value))
+		if (sudoku.validToPlace(rowID, colID, value))
 		{
-			grid[rowID][colID] = value;
-			Creator::incNumHints();
+			sudoku.grid[rowID][colID] = value;
+			sudoku.creator.incNumHints();
 
 			printCompletedSubGrid(rowID, colID);
 
 			if (solveSudoku(solveBackwards))
 				return true;
 
-			grid[rowID][colID] = NULL;   //failure, clear location and continue
-			Creator::decNumHints();
+			sudoku.grid[rowID][colID] = NULL;   //failure, clear location and continue
+			sudoku.creator.decNumHints();
 		}
 	}
 
-	Solver::numBacktracks++;
+	Sudoku::Solver::numBacktracks++;
 	return false;   //failure, start backtracking
 }
 
@@ -410,13 +420,13 @@ bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID)
 	{
 		for (int col = 1; col <= 3; ++col)
 		{
-			int& cellValue = grid[subGridStartRowID + row][subGridStartColID + col];
+			int& cellValue = sudoku.grid[subGridStartRowID + row][subGridStartColID + col];
 			if (cellValue == NULL)
 				return false;
 		}
 	}
 
-	printSubGrid(subGridStartRowID, subGridStartColID);
+	sudoku.printSubGrid(subGridStartRowID, subGridStartColID);
 	return true;
 }
 #pragma endregion

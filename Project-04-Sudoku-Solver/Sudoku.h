@@ -17,16 +17,16 @@ class Sudoku
 public:
 	Sudoku();
 	Sudoku(ofstream* outStream);
-	static void setGrid(int** array);
-	static void printGrid();						              			  //display the number of hints and the grid
-	static void printSubGrid(int rowID, int colID);						      //display the sub-grid by the defined quadrant
-	static void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
-	static int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
-	static bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
+	void setGrid(int array[10][10]);
+	void printGrid();						              			  //display the number of hints and the grid
+	void printSubGrid(int rowID, int colID);						      //display the sub-grid by the defined quadrant
+	void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
+	int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
+	bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
 
 protected:
-	static int grid[10][10];		                                                   //use index 1 to 9
-	static ofstream* outs;
+	int grid[10][10];		                                                   //use index 1 to 9
+	ofstream* outs;
 
 	/*
 	 * Purpose: Solver sub class
@@ -37,19 +37,21 @@ protected:
 	class Solver
 	{
 	public:
-		static bool usedInRow(int rowID, int value);								  //check if the given value has been used in row, if not, return false
-		static bool usedInColumn(int colID, int value);								//check if the given value has been used in column, if not, return false
-		static bool usedInSubGrid(int rowID, int colID, int value);				  //check if the given value has been used in sub-grid, if not, return false
+		Solver(Sudoku& parent);
+		bool usedInRow(int rowID, int value);								  //check if the given value has been used in row, if not, return false
+		bool usedInColumn(int colID, int value);								//check if the given value has been used in column, if not, return false
+		bool usedInSubGrid(int rowID, int colID, int value);				  //check if the given value has been used in sub-grid, if not, return false
 
-		static pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1);	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
-		static bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9, 9-1), if no solution, return false
+		pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1);	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
+		bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9, 9-1), if no solution, return false
 
-		static bool printCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
+		bool printCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
 
 	private:
-		static int numComparisons;
-		static int numBacktracks;
-		static time_t timer;
+		int numComparisons;
+		int numBacktracks;
+		time_t timer;
+		Sudoku& sudoku;
 	};
 
 	/*
@@ -61,17 +63,18 @@ protected:
 	class Creator
 	{
 	public:
-		static void setNumHints(int hints);
-		static int getNumHints();
-		static void incNumHints();                                                        //increase the number of hints by one
-		static void decNumHints();                                                        //decrease the number of hints by one
+		Creator(Sudoku& parent);
+		void setNumHints(int hints);
+		int getNumHints();
+		void incNumHints();                                                        //increase the number of hints by one
+		void decNumHints();                                                        //decrease the number of hints by one
 
 	private:
-		static int numHints;                                                              //require a minimum of 17 numbers
+		int numHints;                                                              //require a minimum of 17 numbers
+		Sudoku& sudoku;
 	};
 
 public:
-	// Class containers for access from within Sudoku class
-	Solver solver;
-	Creator creator;
+	Solver solver = Solver(*this);
+	Creator creator = Creator(*this);
 };
