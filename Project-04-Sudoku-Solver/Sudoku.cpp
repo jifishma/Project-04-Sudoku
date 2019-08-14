@@ -114,6 +114,14 @@ void Sudoku::printGrid()
 	*outs << endl;
 }
 
+/*
+Function Name: printSubGrid
+Author Name: Jeffrey Fishman
+Creation Date: 08/12/2019
+Modification Date: 08/12/2019
+Purpose: display a completed subgrid. Cells not part of the subgrid are marked as X.
+*/
+
 void Sudoku::printSubGrid(int rID, int cID)
 { 
 	cout << "Subgrid completed: " << endl;
