@@ -8,9 +8,9 @@ Creation Date: 08/12/2019
 Modification Date: 08/12/2019
 Purpose: initialize the grid with value NULL (0), and cache an out file stream for use with metrics
 */
-Sudoku::Sudoku(ofstream* outStream)
+Sudoku::Sudoku(ofstream& outStream)
 {
-	outs = outStream;
+	outs = &outStream;
 	Sudoku();
 }
 
@@ -30,7 +30,7 @@ Sudoku& Sudoku::operator=(const Sudoku& puzzle)
 		}
 	}
 
-	this->enableSubGrid = puzzle.enableSubGrid;
+	this->enableSubGridPrinting = puzzle.enableSubGridPrinting;
 	this->outs = puzzle.outs;
 
 	this->creator.setNumHints(this->creator.getNumHints());
@@ -134,9 +134,9 @@ Modification Date: 08/12/2019
 Purpose: display a completed subgrid. Cells not part of the subgrid are marked as X.
 */
 
-void Sudoku::printSubGrid(int rID, int cID)
+void Sudoku::printSubGrid(int rID, int cID) const
 { 
-	if (!enableSubGrid)
+	if (!enableSubGridPrinting)
 		return;
 
 	cout << "Subgrid completed: " << endl;
@@ -186,7 +186,7 @@ Modification Date: 08/07/2019
 Purpose: return the value of the given location (rowID, colID)
 */
 
-int Sudoku::getValue(int rowID, int colID)
+int Sudoku::getValue(int rowID, int colID) const
 {
 	return grid[rowID][colID];
 }
@@ -224,7 +224,7 @@ Creation Date: 08/13/2019
 Modification Date: 08/13/2019
 Purpose: check if the two puzzle grids are identical
 */
-bool Sudoku::operator==(Sudoku& rhs)
+bool Sudoku::operator==(Sudoku& rhs) const
 {
 	for (int row = 1; row <= 9; ++row)
 	{
@@ -247,7 +247,7 @@ Creation Date: 08/13/2019
 Modification Date: 08/13/2019
 Purpose: check if the two puzzle grids are not identical
 */
-bool Sudoku::operator!=(Sudoku& rhs)
+bool Sudoku::operator!=(Sudoku& rhs) const
 {
 	return !operator==(rhs);
 }
@@ -286,7 +286,7 @@ Modification Date: 08/07/2019
 Purpose: return the number of hints
 */
 
-int Sudoku::Creator::getNumHints()
+int Sudoku::Creator::getNumHints() const
 {
 	return numHints;
 }
@@ -327,7 +327,7 @@ Modification Date: 08/12/2019
 Purpose: seach an unassigned location, if the grid has no empty location, return 0
 */
 
-pair<int, int>* Sudoku::Solver::selectUnassignedLocation(int rowID, int colID)
+pair<int, int>* Sudoku::Solver::selectUnassignedLocation(int rowID, int colID) const
 {
 	while (rowID <= 9)
 	{
@@ -473,7 +473,7 @@ Modification Date: 08/12/2019
 Purpose: return if given cell's subgrid is completely populated or not
 */
 
-bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID)
+bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID) const
 {
 	int subGridStartRowID = ((rowID - 1) / 3) * 3;
 	int subGridStartColID = ((colID - 1) / 3) * 3;
@@ -490,5 +490,23 @@ bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID)
 
 	sudoku.printSubGrid(subGridStartRowID, subGridStartColID);
 	return true;
+}
+
+void Sudoku::Solver::printSolveMetrics()
+{
+	cout << "Solver stats: " << endl;
+	*sudoku.outs << "Solver stats: " << endl;
+
+	cout << "\tComparisons made: " << numComparisons << endl;
+	*sudoku.outs << "\tComparisons made: " << numComparisons << endl;
+
+	cout << "\tBacktracks completed: " << numBacktracks << endl;
+	*sudoku.outs << "\tBacktracks completed: " << numBacktracks << endl;
+
+	cout << "\tAverage solve time:" << 0 << endl;
+	*sudoku.outs << "\tAverage solve time:" << 0 << endl;
+
+	cout << endl;
+	*sudoku.outs << endl;
 }
 #pragma endregion

@@ -1,4 +1,5 @@
 #include "../Project-04-Sudoku/Sudoku.h"
+#include "../Project-04-FileOps/FileOps.h"
 
 #include <string>
 #include <limits>
@@ -12,11 +13,9 @@
  * Modification Date: 08/13/2019
  */
 
-void ValidateFileStreams(string inFileName, ifstream& ins, ofstream& outs);
-void PreparePuzzle(string inFileName, Sudoku& puzzle, ifstream& ins, ofstream& outs);
-bool IsValidData(Sudoku& puzzle, int rowID, int colID, int value, ofstream& outs);
+void ValidatePuzzleIsFull(Sudoku& puzzle, ofstream& outs);
 void ValidateNumHints(int& numHints, ofstream& outs);
-void CreateInputFile(Sudoku puzzle, ofstream& outs);
+void CreateSolverInputFile(Sudoku puzzle, ofstream& outs);
 
 int main()
 {
@@ -24,31 +23,22 @@ int main()
 	ofstream outs;
 	string inFileName, outFileName, outStatistic;
 
-	Sudoku puzzle = Sudoku(&outs);
+	Sudoku puzzle = Sudoku(outs);
 
 	int numHints = 0;
 
 	//display welcome message
-	cout << "-----------Welcome to Sudoku Program-----------" << endl;
-	outs << "-----------Welcome to Sudoku Program-----------" << endl;
+	cout << "-----------Welcome to Sudoku Creator Program-----------" << endl;
+	outs << "-----------Welcome to Sudoku Creator Program-----------" << endl;
 
-	//ask for input file path 
-	cout << "Please enter input file name: ";
-	cin >> inFileName;
-
-	//ask for output statistic file path
-	cout << "Please enter output statistic file name: ";
-	cin >> outStatistic;
-
-	//open the input and output file streams
-	ins.open(inFileName);
-	outs.open(outStatistic);
-
-	//validate the file streams are opened successfully and contain data
-	ValidateFileStreams(inFileName, ins, outs);
+	//ask for and open the input and output file streams
+	OpenFileStreams(ins, inFileName, outs, outStatistic);
 
 	//read input file, and populate the puzzle accordingly
 	PreparePuzzle(inFileName, puzzle, ins, outs);
+	
+	//check that the prepared puzzle has every cell populated
+	ValidatePuzzleIsFull(puzzle, outs);
 
 	//close input file
 	ins.close();
@@ -63,9 +53,8 @@ int main()
 	cout << "Please enter the number of hints (17 to 40): ";
 	cin >> numHints;
 
-	//check if the number of hints is valid
+	//check if the user-entered number of hints is valid
 	ValidateNumHints(numHints, outs);
-
 
 
 	//set srand
@@ -115,10 +104,10 @@ int main()
 				//decrease the number of hints by one
 				puzzle.creator.decNumHints();
 
-				//display each iteration
-				cout << "Step " << i << ": " << endl;
-				outs << "Step " << i << ": " << endl;
-				puzzle.printGrid();
+				////display each iteration
+				//cout << "Step " << i << ": " << endl;
+				//outs << "Step " << i << ": " << endl;
+				//puzzle.printGrid();
 
 				//go to next iteration
 				++i;
@@ -137,7 +126,7 @@ int main()
 	outs.open(outFileName);
 
 	//create input file for Sudoku solver
-	CreateInputFile(puzzle, outs);
+	CreateSolverInputFile(puzzle, outs);
 
 	//close output file
 	outs.close();
@@ -146,77 +135,16 @@ int main()
 	return 0;
 }
 
-
-
 /*
-Function Name: ValidateFileStreams
+Function Name: ValidatePuzzleIsFull
 Author Name: Chong Zhang, Jeffrey Fishman
-Creation Date: 08/12/2019
-Modification Date: 08/13/2019
-Purpose: check if the input file is valid, if not, stop program
+Creation Date: 08/05/2019
+Modification Date: 08/14/2019
+Purpose: validate that the puzzle is filled
 */
 
-void ValidateFileStreams(string inFileName, ifstream& ins, ofstream& outs)
+void ValidatePuzzleIsFull(Sudoku& puzzle, ofstream& outs)
 {
-	//check if input file exists and opened properly
-	if (!ins.is_open() || !ins.good())
-	{
-		cout << "Error - Provided input file '" << inFileName << "' does not exist or could not be read. Exiting program." << endl;
-		outs << "Error - Provided input file '" << inFileName << "' does not exist or could not be read. Exiting program." << endl;
-		system("pause");
-		exit(EXIT_FAILURE);
-	}
-
-	//check if input file is empty
-	if (ins.peek() == EOF)
-	{
-		cout << "Error - Input file '" << inFileName << "' exists but contains no data. Exiting program." << endl;
-		outs << "Error - Input file '" << inFileName << "' exists but contains no data. Exiting program." << endl;
-		system("pause");
-		exit(EXIT_FAILURE);
-	}
-}
-
-
-
-/*
-Function Name: PreparePuzzle
-Author Name: Chong Zhang, Jeffrey Fishman
-Creation Date: 08/12/2019
-Modification Date: 08/13/2019
-Purpose: read input file, store into an array and return the number of hints, if file contains invalid data, stop program
-*/
-
-void PreparePuzzle(string inFileName, Sudoku& puzzle, ifstream& ins, ofstream& outs)
-{
-	int rowID, colID, value;
-	puzzle.creator.setNumHints(0);
-
-	//display input file name
-	cout << endl << "Input file name: " << inFileName << endl;
-	outs << "Input file name: " << inFileName << endl;
-
-	//read input file line by line
-	ins >> rowID >> colID >> value;
-	while (ins)
-	{
-		//check if data is valid
-		if (IsValidData(puzzle, rowID, colID, value, outs))
-		{
-			cout << rowID << " " << colID << " " << value << endl;
-			outs << rowID << " " << colID << " " << value << endl;
-
-			puzzle.setValue(rowID, colID, value);
-			puzzle.creator.incNumHints();
-		}
-		else
-		{
-			system("pause");
-			exit(EXIT_FAILURE);            //invalid input data, stop program
-		}
-		ins >> rowID >> colID >> value;
-	}
-
 	//check if there is any empty location
 	if (puzzle.creator.getNumHints() != 81)
 	{
@@ -226,48 +154,7 @@ void PreparePuzzle(string inFileName, Sudoku& puzzle, ifstream& ins, ofstream& o
 		system("pause");
 		exit(EXIT_FAILURE);                //the grid has empty location, stop program
 	}
-
-	cout << endl;
-	outs << endl;
 }
-
-
-
-/*
-Function Name: IsValidData
-Author Name: Chong Zhang, Jeffrey Fishman
-Creation Date: 08/07/2019
-Modification Date: 08/132019
-Purpose: check if input file contains invalid value or duplicate value
-*/
-
-bool IsValidData(Sudoku& puzzle, int rowID, int colID, int value, ofstream& outs)
-{
-	//check if input file contains duplicate data
-	if (puzzle.getValue(rowID, colID) != NULL)
-	{
-		cout << rowID << " " << colID << " " << value;
-		outs << rowID << " " << colID << " " << value;
-
-		cerr << "\t\t Error - Duplicate value - Program ended" << endl;
-		outs << "\t\t Error - Duplicate value - Program ended" << endl;
-		return false;
-	}
-
-	//check if input file contains invalid value 
-	if (value < 1 || value > 9)
-	{
-		cout << rowID << " " << colID << " " << value;
-		outs << rowID << " " << colID << " " << value;
-
-		cerr << "\t\t Error - Invalid value - Program ended" << endl;
-		outs << "\t\t Error - Invalid value - Program ended" << endl;
-		return false;
-	}
-
-	return true;                //valid data, return 1
-}
-
 
 
 /*
@@ -296,14 +183,14 @@ void ValidateNumHints(int& numHints, ofstream& outs)
 
 
 /*
-Function Name: CreateInputFile
+Function Name: CreateSolverInputFile
 Author Name: Chong Zhang
 Creation Date: 08/05/2019
 Modification Date: 08/12/2019
 Purpose: create input file for Sudoku solver
 */
 
-void CreateInputFile(Sudoku puzzle, ofstream& outs)
+void CreateSolverInputFile(Sudoku puzzle, ofstream& outs)
 {
 	for (int rowID = 1; rowID <= 9; ++rowID)
 	{

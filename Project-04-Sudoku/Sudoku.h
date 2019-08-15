@@ -16,20 +16,20 @@ class Sudoku
 {
 public:
 	Sudoku();
-	Sudoku(ofstream* outStream);
+	Sudoku(ofstream& outStream);
 	Sudoku(const Sudoku& puzzle);
 
 	void setGrid(int array[10][10]);
 	void printGrid();						              			  //display the number of hints and the grid
-	void printSubGrid(int rowID, int colID);						      //display the sub-grid by the defined quadrant
+	void printSubGrid(int rowID, int colID) const;						      //display the sub-grid by the defined quadrant
 	void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
-	int getValue(int rowID, int colID);								  //return the value in the given lacation (rowID, colID)
+	int getValue(int rowID, int colID) const;								  //return the value in the given lacation (rowID, colID)
 	bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
 
-	bool enableSubGrid = false;
+	bool enableSubGridPrinting = true;
 
-	bool operator==(Sudoku& rhs);                                     //check if two puzzle grids are equal
-	bool operator!=(Sudoku& rhs);                                     //check if two puzzle grids are not equal
+	bool operator==(Sudoku& rhs) const;                                     //check if two puzzle grids are equal
+	bool operator!=(Sudoku& rhs) const;                                     //check if two puzzle grids are not equal
 	Sudoku& operator=(const Sudoku& rhs);
 
 protected:
@@ -50,16 +50,17 @@ protected:
 		bool usedInColumn(int colID, int value);								//check if the given value has been used in column, if not, return false
 		bool usedInSubGrid(int rowID, int colID, int value);				  //check if the given value has been used in sub-grid, if not, return false
 
-		pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1);	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
+		pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1) const;	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
 		bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9 and 9-1), if no solution, return false
 
-		bool printCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
+		bool printCompletedSubGrid(int rowID, int colID) const;                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
+		void printSolveMetrics();
 
 	private:
 		int numComparisons;
 		int numBacktracks;
 		time_t timer;
-		Sudoku& sudoku;
+		Sudoku& sudoku;                                                            //explicit reference to parent superclass
 	};
 
 	/*
@@ -73,13 +74,13 @@ protected:
 	public:
 		Creator(Sudoku& parent);
 		void setNumHints(int hints);
-		int getNumHints();
+		int getNumHints() const;
 		void incNumHints();                                                        //increase the number of hints by one
 		void decNumHints();                                                        //decrease the number of hints by one
 
 	private:
 		int numHints;                                                              //require a minimum of 17 numbers
-		Sudoku& sudoku;
+		Sudoku& sudoku;                                                            //explicit reference to parent superclass
 	};
 
 public:
