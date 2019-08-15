@@ -12,10 +12,12 @@ int main(int argc, char** argv)
 
 	// Display welcome message
 	cout << "-----------Welcome to Sudoku Solver Program-----------" << endl;
-	outs << "-----------Welcome to Sudoku Solver Program-----------" << endl;
 
 	// Ask for and open the input and output files
 	OpenFileStreams(ins, inFileName, outs, outStatistic);
+
+	// Print welcome message to file
+	outs << "-----------Welcome to Sudoku Solver Program-----------" << endl;
 
 	// Read input file, and populate the puzzle accordingly
 	PreparePuzzle(inFileName, puzzle, ins, outs);

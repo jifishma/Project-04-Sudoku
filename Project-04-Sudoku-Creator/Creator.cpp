@@ -30,10 +30,12 @@ int main()
 
 	//display welcome message
 	cout << "-----------Welcome to Sudoku Creator Program-----------" << endl;
-	outs << "-----------Welcome to Sudoku Creator Program-----------" << endl;
 
 	//ask for and open the input and output file streams
 	OpenFileStreams(ins, inFileName, outs, outStatistic);
+
+	//print welcome message to file
+	outs << "-----------Welcome to Sudoku Creator Program-----------" << endl;
 
 	//read input file, and populate the puzzle accordingly
 	PreparePuzzle(inFileName, puzzle, ins, outs);
