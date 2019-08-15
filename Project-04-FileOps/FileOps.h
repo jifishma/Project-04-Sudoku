@@ -133,3 +133,20 @@ void OpenFileStreams(ifstream& ins, string& inFileName, ofstream& outs, string& 
 	//validate the file streams are opened successfully and contain data
 	ValidateFileStreams(inFileName, ins, outs);
 }
+
+/*
+Function Name: CloseFileStreams
+Author Name: Jeffrey Fishman
+Creation Date: 08/07/2019
+Modification Date: 08/13/2019
+Purpose: close the provided file streams if they're open
+*/
+
+void CloseFileStreams(ifstream& ins, ofstream& outs)
+{
+	if (ins.is_open())
+		ins.close();
+
+	if (outs.is_open())
+		outs.close();
+}

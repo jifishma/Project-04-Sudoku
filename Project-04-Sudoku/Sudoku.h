@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -21,12 +22,9 @@ public:
 
 	void setGrid(int array[10][10]);
 	void printGrid();						              			  //display the number of hints and the grid
-	void printSubGrid(int rowID, int colID) const;						      //display the sub-grid by the defined quadrant
 	void setValue(int rowID, int colID, int value);							 //set the value in the given lacation (rowID, colID)
 	int getValue(int rowID, int colID) const;								  //return the value in the given lacation (rowID, colID)
 	bool validToPlace(int rowID, int colID, int value);				  //check if the given value is valid to place in location (rowID, colID), if not, return 0
-
-	bool enableSubGridPrinting = true;
 
 	bool operator==(Sudoku& rhs) const;                                     //check if two puzzle grids are equal
 	bool operator!=(Sudoku& rhs) const;                                     //check if two puzzle grids are not equal
@@ -52,15 +50,17 @@ protected:
 
 		pair<int, int>* selectUnassignedLocation(int rowID = 1, int colID = 1) const;	       //find an unassigned location (rowID, colID), if grid has no empty location, return false
 		bool solveSudoku(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9 and 9-1), if no solution, return false
+		bool solveSudokuWithTimer(bool solveBackwards = false);                //solve sudoku in the specified direction (1-9 and 9-1), if no solution, return false
 
-		bool printCompletedSubGrid(int rowID, int colID) const;                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
+		bool computeCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
 		void printSolveMetrics();
 
 	private:
 		int numComparisons;
 		int numBacktracks;
-		time_t timer;
+		int numSubGridIterations;
 		Sudoku& sudoku;                                                            //explicit reference to parent superclass
+		chrono::duration<double> solveTimer;
 	};
 
 	/*

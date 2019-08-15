@@ -104,10 +104,10 @@ int main()
 				//decrease the number of hints by one
 				puzzle.creator.decNumHints();
 
-				////display each iteration
-				//cout << "Step " << i << ": " << endl;
-				//outs << "Step " << i << ": " << endl;
-				//puzzle.printGrid();
+				//display each iteration
+				cout << "Step " << i << ": " << endl;
+				outs << "Step " << i << ": " << endl;
+				puzzle.printGrid();
 
 				//go to next iteration
 				++i;

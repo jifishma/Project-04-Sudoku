@@ -30,7 +30,6 @@ Sudoku& Sudoku::operator=(const Sudoku& puzzle)
 		}
 	}
 
-	this->enableSubGridPrinting = puzzle.enableSubGridPrinting;
 	this->outs = puzzle.outs;
 
 	this->creator.setNumHints(this->creator.getNumHints());
@@ -96,58 +95,6 @@ void Sudoku::printGrid()
 		{
 			//unsigned location marked as X
 			if (grid[rowID][colID] == NULL)
-			{
-				cout << "X ";
-				*outs << "X ";
-			}
-			else
-			{
-				cout << grid[rowID][colID] << " ";
-				*outs << grid[rowID][colID] << " ";
-			}
-
-			if (!(colID % 3) && colID != 9)
-			{
-				cout << "| ";
-				*outs << "| ";
-			}
-		}
-
-		if (!(rowID % 3) && rowID != 9)
-		{
-			cout << setw(21) << setfill('-') << endl << "-";
-			*outs << setw(21) << setfill('-') << endl << "-";
-		}
-
-		cout << endl;
-		*outs << endl;
-	}
-	cout << endl;
-	*outs << endl;
-}
-
-/*
-Function Name: printSubGrid
-Author Name: Jeffrey Fishman
-Creation Date: 08/12/2019
-Modification Date: 08/12/2019
-Purpose: display a completed subgrid. Cells not part of the subgrid are marked as X.
-*/
-
-void Sudoku::printSubGrid(int rID, int cID) const
-{ 
-	if (!enableSubGridPrinting)
-		return;
-
-	cout << "Subgrid completed: " << endl;
-	*outs << "Subgrid completed: " << endl;
-
-	for (int rowID = 1; rowID <= 9; ++rowID)
-	{
-		for (int colID = 1; colID <= 9; ++colID)
-		{
-			//unsigned location marked as X
-			if (rowID > rID + 3 || colID > cID + 3 || rowID <= rID || colID <= cID )
 			{
 				cout << "X ";
 				*outs << "X ";
@@ -451,7 +398,7 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 			sudoku.grid[rowID][colID] = value;
 			sudoku.creator.incNumHints();
 
-			printCompletedSubGrid(rowID, colID);
+			computeCompletedSubGrid(rowID, colID);
 
 			if (solveSudoku(solveBackwards))
 				return true;
@@ -465,15 +412,25 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 	return false;   //failure, start backtracking
 }
 
+bool Sudoku::Solver::solveSudokuWithTimer(bool solveBackwards)
+{
+	auto start = chrono::high_resolution_clock::now();
+	bool result = solveSudoku(solveBackwards);
+	auto end = chrono::high_resolution_clock::now();
+
+	solveTimer = end - start;
+	return result;
+}
+
 /*
-Function Name: printCompletedSubGrid
+Function Name: computeCompletedSubGrid
 Author Name: Jeffrey Fishman
 Creation Date: 08/12/2019
 Modification Date: 08/12/2019
 Purpose: return if given cell's subgrid is completely populated or not
 */
 
-bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID) const
+bool Sudoku::Solver::computeCompletedSubGrid(int rowID, int colID)
 {
 	int subGridStartRowID = ((rowID - 1) / 3) * 3;
 	int subGridStartColID = ((colID - 1) / 3) * 3;
@@ -488,7 +445,7 @@ bool Sudoku::Solver::printCompletedSubGrid(int rowID, int colID) const
 		}
 	}
 
-	sudoku.printSubGrid(subGridStartRowID, subGridStartColID);
+	numSubGridIterations++;
 	return true;
 }
 
@@ -503,8 +460,17 @@ void Sudoku::Solver::printSolveMetrics()
 	cout << "\tBacktracks completed: " << numBacktracks << endl;
 	*sudoku.outs << "\tBacktracks completed: " << numBacktracks << endl;
 
-	cout << "\tAverage solve time:" << 0 << endl;
-	*sudoku.outs << "\tAverage solve time:" << 0 << endl;
+	cout << "\tNumber of sub-grid iterations: " << numSubGridIterations << endl;
+	*sudoku.outs << "\tNumber of sub-grid iterations: " << numSubGridIterations << endl;
+
+	cout << "\tPuzzle Comparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+	*sudoku.outs << "\tPuzzle Comparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+
+	if (solveTimer.count())
+	{
+		cout << "\tAverage solve time: " << solveTimer.count() << " seconds" << endl;
+		*sudoku.outs << "\tAverage solve time: " << solveTimer.count() << " seconds" << endl;
+	}
 
 	cout << endl;
 	*sudoku.outs << endl;
