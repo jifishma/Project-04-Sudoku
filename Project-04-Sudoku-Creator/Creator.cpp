@@ -57,7 +57,6 @@ int main()
 	//check if the user-entered number of hints is valid
 	ValidateNumHints(numHints, outs);
 
-
 	//set srand
 	srand(time(0));
 
@@ -75,13 +74,13 @@ int main()
 		//get the value in location (rowID, colID)
 		int value = puzzle.getValue(rowID, colID);
 
-		//display the data about the selected location
-		cout << "(" << colID << ", " << rowID << ") " << value << endl;
-		outs << "(" << colID << ", " << rowID << ") " << value << endl;
-
 		//check if the selected location is valid
 		if (value != NULL)
 		{
+			//display the data about the selected location
+			cout << "(" << colID << ", " << rowID << ") " << value << endl;
+			outs << "(" << colID << ", " << rowID << ") " << value << endl;
+
 			//unassign location
 			puzzle.setValue(rowID, colID, NULL);
 
@@ -176,8 +175,8 @@ void ValidateNumHints(int& numHints, ofstream& outs)
 		cin >> numHints;
 	}
 
-	cout << "Number of hints: " << numHints << endl;
-	outs << "Number of hints: " << numHints << endl;
+	cout << "Requested number of hints: " << numHints << endl;
+	outs << "Requested number of hints: " << numHints << endl;
 }
 
 
