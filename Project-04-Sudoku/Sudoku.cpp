@@ -31,8 +31,10 @@ Sudoku& Sudoku::operator=(const Sudoku& puzzle)
 	}
 
 	this->outs = puzzle.outs;
+	this->state = puzzle.state;
 
-	this->creator.setNumHints(this->creator.getNumHints());
+	if(puzzle.state == State::Creating)
+		this->creator.setNumHints(this->creator.getNumHints());
 
 	return *this;
 }
@@ -85,8 +87,11 @@ Purpose: display current number of hints, current grid (unassigned location mark
 
 void Sudoku::printGrid()
 {
-	cout << creator.getNumHints() << endl;
-	*outs << creator.getNumHints() << endl;
+	if (state == State::Creating)
+	{
+		cout << "Number of hints: " << creator.getNumHints() << endl;
+		*outs << "Number of hints: " << creator.getNumHints() << endl;
+	}
 
 	//display current grid
 	for (int rowID = 1; rowID <= 9; ++rowID)
@@ -377,13 +382,17 @@ Purpose: solve sudoku (start from value 1), if no solution, return false. Suppor
 
 bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 {
+	// return a pair that points to the first empty cell of the puzzle
 	pair<int, int>* cell = selectUnassignedLocation();
+
+	// if we don't find any empty cells, we've succeeded and can exit safely
 	if (cell == nullptr)
 		return true;    //success
 
 	int rowID = cell->first, colID = cell->second;
 	int from = 1, to = 9, increment = 1;
 
+	// If we plan to solve backwards, set the 'if' statement variable values appropriately
 	if (solveBackwards)
 	{
 		from = 9;
@@ -393,21 +402,36 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 
 	for (int value = from; solveBackwards ? value >= to : value <= to; value += increment)
 	{
+		// if we don't already have this value in the row, column, or sub-grid...
 		if (sudoku.validToPlace(rowID, colID, value))
 		{
+			// tentatively place the value there, and continue solving the puzzle
 			sudoku.grid[rowID][colID] = value;
-			sudoku.creator.incNumHints();
 
-			computeCompletedSubGrid(rowID, colID);
+			if(sudoku.state == State::Creating)
+				sudoku.creator.incNumHints();
+
+			// we still want to compute sub grid stats, so we won't short-circuit this block with the bool flag first
+			if (computeCompletedSubGrid(rowID, colID) && sudoku.state == State::Solving)
+			{
+				cout << "Completed sub-grid with value " << value << " at (" << colID << ", " << rowID << ")" << endl;
+				*sudoku.outs << "Completed sub-grid with value " << value << " at (" << colID << ", " << rowID << ")" << endl;
+
+				sudoku.printGrid();
+			}
 
 			if (solveSudoku(solveBackwards))
-				return true;
+				return true;                    // if we manage to make it here, we've solved the whole puzzle
 
-			sudoku.grid[rowID][colID] = NULL;   //failure, clear location and continue
-			sudoku.creator.decNumHints();
+			// If we made it here, out tentative value didn't work out, and we'll try the next one
+			sudoku.grid[rowID][colID] = NULL;
+
+			if (sudoku.state == State::Creating)
+				sudoku.creator.decNumHints();
 		}
 	}
 
+	// If we made it here, then we haven't chosen a correct tentative value somewhere previously, and the puzzle is in an unsolvable state
 	Sudoku::Solver::numBacktracks++;
 	return false;   //failure, start backtracking
 }

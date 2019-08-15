@@ -8,6 +8,7 @@ int main(int argc, char** argv)
 	string inFileName, outStatistic;
 
 	Sudoku puzzle = Sudoku(outs);
+	puzzle.state = State::Solving;
 
 	// Display welcome message
 	cout << "-----------Welcome to Sudoku Solver Program-----------" << endl;
@@ -23,6 +24,8 @@ int main(int argc, char** argv)
 	puzzle.solver.solveSudokuWithTimer();
 
 	// Once fully solved, print the complete puzzle grid
+	cout << "Final puzzle: " << endl;
+	outs << "Final puzzle: " << endl;
 	puzzle.printGrid();
 
 	// Once we get here, print out collected metrics from finding a solution
@@ -31,5 +34,6 @@ int main(int argc, char** argv)
 	// Close the file streams
 	CloseFileStreams(ins, outs);
 
+	system("pause");
 	return 0;
 }

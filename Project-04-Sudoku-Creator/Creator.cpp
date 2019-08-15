@@ -24,6 +24,7 @@ int main()
 	string inFileName, outFileName, outStatistic;
 
 	Sudoku puzzle = Sudoku(outs);
+	puzzle.state = State::Creating;
 
 	int numHints = 0;
 
@@ -75,8 +76,8 @@ int main()
 		int value = puzzle.getValue(rowID, colID);
 
 		//display the data about the selected location
-		cout << "(" << rowID << ", " << colID << ") " << value << endl;
-		outs << "(" << rowID << ", " << colID << ") " << value << endl;
+		cout << "(" << colID << ", " << rowID << ") " << value << endl;
+		outs << "(" << colID << ", " << rowID << ") " << value << endl;
 
 		//check if the selected location is valid
 		if (value != NULL)

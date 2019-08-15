@@ -13,6 +13,12 @@
 
 using namespace std;
 
+enum State
+{
+	Creating,
+	Solving
+};
+
 class Sudoku
 {
 public:
@@ -30,6 +36,7 @@ public:
 	bool operator!=(Sudoku& rhs) const;                                     //check if two puzzle grids are not equal
 	Sudoku& operator=(const Sudoku& rhs);
 
+	State state;                                                       //are we creating or solving the puzzle right now?
 protected:
 	int grid[10][10];		                                                   //use index 1 to 9
 	ofstream* outs;
