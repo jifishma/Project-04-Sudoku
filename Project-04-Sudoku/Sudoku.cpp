@@ -478,6 +478,9 @@ void Sudoku::Solver::printSolveMetrics()
 	cout << "Solver stats: " << endl;
 	*sudoku.outs << "Solver stats: " << endl;
 
+	cout << "\tHints given: " << sudoku.creator.getNumHints() << endl;
+	*sudoku.outs << "\tHints given: " << sudoku.creator.getNumHints() << endl;
+
 	cout << "\tComparisons made: " << numComparisons << endl;
 	*sudoku.outs << "\tComparisons made: " << numComparisons << endl;
 
@@ -487,8 +490,11 @@ void Sudoku::Solver::printSolveMetrics()
 	cout << "\tNumber of sub-grid iterations: " << numSubGridIterations << endl;
 	*sudoku.outs << "\tNumber of sub-grid iterations: " << numSubGridIterations << endl;
 
-	cout << "\tPuzzle Comparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
-	*sudoku.outs << "\tPuzzle Comparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+	cout << "\tComparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+	*sudoku.outs << "\tComparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+
+	cout << "\tBacktracks to Hints ratio: " << (numBacktracks / (double)sudoku.creator.getNumHints()) << ":1" << endl;
+	*sudoku.outs << "\tBacktracks to Hints ratio: " << (numBacktracks / (double)sudoku.creator.getNumHints()) << ":1" << endl;
 
 	if (solveTimer.count())
 	{
