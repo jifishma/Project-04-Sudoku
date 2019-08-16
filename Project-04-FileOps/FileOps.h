@@ -11,17 +11,6 @@ Purpose: check if input file contains invalid value or duplicate value
 
 bool IsValidData(Sudoku& puzzle, int rowID, int colID, int value, ofstream& outs)
 {
-	//check if input file contains duplicate data
-	if (puzzle.getValue(rowID, colID) != NULL)
-	{
-		cout << rowID << " " << colID << " " << value;
-		outs << rowID << " " << colID << " " << value;
-
-		cerr << "\t\t Error - Duplicate value - Program ended" << endl;
-		outs << "\t\t Error - Duplicate value - Program ended" << endl;
-		return false;
-	}
-
 	//check if input file contains invalid value 
 	if (value < 1 || value > 9)
 	{
@@ -30,6 +19,17 @@ bool IsValidData(Sudoku& puzzle, int rowID, int colID, int value, ofstream& outs
 
 		cerr << "\t\t Error - Invalid value - Program ended" << endl;
 		outs << "\t\t Error - Invalid value - Program ended" << endl;
+		return false;
+	}
+
+	//check if input file contains duplicate data
+	if (puzzle.getValue(rowID, colID) != NULL)
+	{
+		cout << rowID << " " << colID << " " << value;
+		outs << rowID << " " << colID << " " << value;
+
+		cerr << "\t\t Error - Duplicate value - Program ended" << endl;
+		outs << "\t\t Error - Duplicate value - Program ended" << endl;
 		return false;
 	}
 
