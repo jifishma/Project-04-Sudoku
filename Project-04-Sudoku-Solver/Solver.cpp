@@ -22,6 +22,11 @@ int main(int argc, char** argv)
 	// Read input file, and populate the puzzle accordingly
 	PreparePuzzle(inFileName, puzzle, ins, outs);
 
+	// Show the initial puzzle grid after loading
+	cout << "Initial puzzle: " << endl;
+	outs << "Initial puzzle: " << endl;
+	puzzle.printGrid();
+
 	// Solve the puzzle, showing iteratations of solved sub-grids as we progress
 	puzzle.solver.solveSudokuWithTimer();
 
