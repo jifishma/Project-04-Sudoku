@@ -15,7 +15,7 @@ Sudoku::Sudoku(ofstream& outStream)
 }
 
 Sudoku::Sudoku(const Sudoku& puzzle)
-{ 
+{
 	operator=(puzzle);
 }
 
@@ -33,7 +33,7 @@ Sudoku& Sudoku::operator=(const Sudoku& puzzle)
 	this->outs = puzzle.outs;
 	this->state = puzzle.state;
 
-	if(puzzle.state == State::Creating)
+	if (puzzle.state == State::Creating)
 		this->creator.setNumHints(this->creator.getNumHints());
 
 	return *this;
@@ -408,14 +408,14 @@ bool Sudoku::Solver::solveSudoku(bool solveBackwards)
 			// tentatively place the value there, and continue solving the puzzle
 			sudoku.grid[rowID][colID] = value;
 
-			if(sudoku.state == State::Creating)
+			if (sudoku.state == State::Creating)
 				sudoku.creator.incNumHints();
 
 			// we still want to compute sub grid stats, so we won't short-circuit this block with the bool flag first
 			if (computeCompletedSubGrid(rowID, colID) && sudoku.state == State::Solving)
 			{
-				cout << "Completed sub-grid with value " << value << " at (" << colID << ", " << rowID << ")" << endl;
-				*sudoku.outs << "Completed sub-grid with value " << value << " at (" << colID << ", " << rowID << ")" << endl;
+				cout << "Completed sub-grid with value " << value << " at (" << rowID << ", " << colID << ")" << endl;
+				*sudoku.outs << "Completed sub-grid with value " << value << " at (" << rowID << ", " << colID << ")" << endl;
 
 				sudoku.printGrid();
 			}
@@ -473,6 +473,14 @@ bool Sudoku::Solver::computeCompletedSubGrid(int rowID, int colID)
 	return true;
 }
 
+/*
+Function Name: printSolveMetrics
+Author Name: Jeffrey Fishman
+Creation Date: 08/12/2019
+Modification Date: 08/14/2019
+Purpose: print out all collected metrics while solving
+*/
+
 void Sudoku::Solver::printSolveMetrics()
 {
 	cout << "Solver stats: " << endl;
@@ -504,5 +512,28 @@ void Sudoku::Solver::printSolveMetrics()
 
 	cout << endl;
 	*sudoku.outs << endl;
+}
+
+/*
+Function Name: getNumComparisons, getNumBacktracks, getNumSubGridIterations
+Author Name: Chong Zhang
+Creation Date: 08/16/2019
+Modification Date: 08/16/2019
+Purpose: return the number of comparisons, backtracks and sub-grid interations
+*/
+
+int Sudoku::Solver::getNumComparisons()
+{
+	return numComparisons;
+}
+
+int Sudoku::Solver::getNumBacktracks()
+{
+	return numBacktracks;
+}
+
+int Sudoku::Solver::getNumSubGridIterations()
+{
+	return numSubGridIterations;
 }
 #pragma endregion

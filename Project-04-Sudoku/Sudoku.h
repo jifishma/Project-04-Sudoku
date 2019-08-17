@@ -11,7 +11,7 @@
 #include <fstream>
 #include <chrono>
 
-using namespace std;
+	using namespace std;
 
 enum State
 {
@@ -61,6 +61,9 @@ protected:
 
 		bool computeCompletedSubGrid(int rowID, int colID);                       //check if the sub-grid is completed, and print it out if it is complete at some point in time
 		void printSolveMetrics();
+		int getNumComparisons();
+		int getNumBacktracks();
+		int getNumSubGridIterations();
 
 	private:
 		int numComparisons;

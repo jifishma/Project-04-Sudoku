@@ -15,7 +15,7 @@
 
 void ValidatePuzzleIsFull(Sudoku& puzzle, ofstream& outs);
 void ValidateNumHints(int& numHints, ofstream& outs);
-void CreateSolverInputFile(Sudoku puzzle, ofstream& outs);
+void CreateCreatorInputFile(Sudoku puzzle, ofstream& outs);
 
 int main()
 {
@@ -27,6 +27,10 @@ int main()
 	puzzle.state = State::Creating;
 
 	int numHints = 0;
+	int numRandNum = 0;
+	int numComparisons = 0;
+	int numBacktracks = 0;
+	int numSubGridIterations = 0;
 
 	//display welcome message
 	cout << "-----------Welcome to Sudoku Creator Program-----------" << endl;
@@ -39,7 +43,7 @@ int main()
 
 	//read input file, and populate the puzzle accordingly
 	PreparePuzzle(inFileName, puzzle, ins, outs);
-	
+
 	//check that the prepared puzzle has every cell populated
 	ValidatePuzzleIsFull(puzzle, outs);
 
@@ -68,6 +72,7 @@ int main()
 	{
 		//generate a rand number between 0 to 80
 		int popID = rand() % 81;
+		++numRandNum;
 
 		//get location ID
 		int rowID = popID / 9 + 1;
@@ -79,10 +84,6 @@ int main()
 		//check if the selected location is valid
 		if (value != NULL)
 		{
-			//display the data about the selected location
-			cout << "(" << colID << ", " << rowID << ") " << value << endl;
-			outs << "(" << colID << ", " << rowID << ") " << value << endl;
-
 			//unassign location
 			puzzle.setValue(rowID, colID, NULL);
 
@@ -92,9 +93,14 @@ int main()
 
 			//solve the first copy of the created Sudoku start from location (1, 1) and value in increasing order (1 to 9)
 			copyPuzzle1.solver.solveSudoku();
+			numComparisons += copyPuzzle1.solver.getNumComparisons();
+			numBacktracks += copyPuzzle1.solver.getNumBacktracks();
 
 			//solve the second copy of the created Sudoku start from location (1, 1) and value in decreasing order (9 to 1)
 			copyPuzzle2.solver.solveSudoku(true);
+			numComparisons += copyPuzzle2.solver.getNumComparisons();
+			numBacktracks += copyPuzzle2.solver.getNumBacktracks();
+
 
 			//compare the two above solutions to check if there are multiple solutions
 			if (copyPuzzle1 != copyPuzzle2)
@@ -106,9 +112,11 @@ int main()
 				//decrease the number of hints by one
 				puzzle.creator.decNumHints();
 
-				//display each iteration
+				//display the data about the selected pop location
 				cout << "Step " << i << ": " << endl;
 				outs << "Step " << i << ": " << endl;
+				cout << "Popped value " << value << " at (" << rowID << ", " << colID << ")" << endl;
+				outs << "Popped value " << value << " at (" << rowID << ", " << colID << ")" << endl;
 				puzzle.printGrid();
 
 				//go to next iteration
@@ -116,6 +124,20 @@ int main()
 			}
 		}
 	}
+
+	// Once we get here, print out collected metrics from finding a solution
+	cout << "Creator stats: " << endl;
+	cout << "\tRandom number made: " << numRandNum << endl;
+	cout << "\tComparisons made: " << numComparisons << endl;
+	cout << "\tBacktracks completed: " << numBacktracks << endl;
+	cout << "\tPuzzle Comparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+
+	outs << "Creator stats: " << endl;
+	outs << "\tRandom number made: " << numRandNum << endl;
+	outs << "\tComparisons made: " << numComparisons << endl;
+	outs << "\tBacktracks completed: " << numBacktracks << endl;
+	outs << "\tPuzzle Comparisons to Backtracks ratio: " << (numComparisons / (double)numBacktracks) << ":1" << endl;
+
 
 	//close output statistic file
 	outs.close();
@@ -128,7 +150,7 @@ int main()
 	outs.open(outFileName);
 
 	//create input file for Sudoku solver
-	CreateSolverInputFile(puzzle, outs);
+	CreateCreatorInputFile(puzzle, outs);
 
 	//close output file
 	outs.close();
@@ -177,8 +199,8 @@ void ValidateNumHints(int& numHints, ofstream& outs)
 		cin >> numHints;
 	}
 
-	cout << "Requested number of hints: " << numHints << endl;
-	outs << "Requested number of hints: " << numHints << endl;
+	cout << "Requested number of hints: " << numHints << endl << endl;
+	outs << "Requested number of hints: " << numHints << endl << endl;
 }
 
 
@@ -192,7 +214,7 @@ Modification Date: 08/12/2019
 Purpose: create input file for Sudoku solver
 */
 
-void CreateSolverInputFile(Sudoku puzzle, ofstream& outs)
+void CreateCreatorInputFile(Sudoku puzzle, ofstream& outs)
 {
 	for (int rowID = 1; rowID <= 9; ++rowID)
 	{
